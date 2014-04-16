@@ -224,14 +224,9 @@ module Devise
         # Attributes must contain the user's email, other attributes will be
         # set in the record
         def _invite(attributes={}, invited_by=nil, &block)
-          invite_key_array = invite_key_fields
-          attributes_hash = {}
-          invite_key_array.each do |k,v|
-            attribute = attributes.delete(k)
-            attribute = attribute.to_s.strip if strip_whitespace_keys.include?(k)
-            attributes_hash[k] = attribute
-          end
+          attributes_hash = _extract_invite_key_attributes(attributes)
 
+          invite_key_array = invite_key_fields
           invitable = find_or_initialize_with_errors(invite_key_array, attributes_hash)
           invitable.assign_attributes(attributes)
           invitable.invited_by = invited_by
@@ -250,6 +245,19 @@ module Devise
           mail = invitable.invite! if invitable.errors.empty?
           [invitable, mail]
         end
+
+        # Extracts the attributes included in #invite_key_fields
+        #
+        def _extract_invite_key_attributes(attributes)
+          attributes_hash = {}
+          invite_key_fields.each do |key|
+            attribute = attributes.delete(key)
+            attribute = attribute.to_s.strip if strip_whitespace_keys.include?(key)
+            attributes_hash[key] = attribute
+          end
+          attributes_hash
+        end
+        private :_extract_invite_key_attributes
 
         def invite!(attributes={}, invited_by=nil, &block)
           invitable, mail = _invite(attributes.with_indifferent_access, invited_by, &block)
@@ -293,7 +301,6 @@ module Devise
         def after_invitation_accepted(*args, &blk)
           set_callback(:invitation_accepted, :after, *args, &blk)
         end
-
 
         Devise::Models.config(self, :invite_for)
         Devise::Models.config(self, :validate_on_invite)
