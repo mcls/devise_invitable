@@ -260,12 +260,12 @@ module Devise
         private :_extract_invite_key_attributes
 
         def invite!(attributes={}, invited_by=nil, &block)
-          invitable, mail = _invite(attributes.with_indifferent_access, invited_by, &block)
+          invitable, _ = _invite(attributes.with_indifferent_access, invited_by, &block)
           invitable
         end
 
         def invite_mail!(attributes={}, invited_by=nil, &block)
-          invitable, mail = _invite(attributes, invited_by, &block)
+          _, mail = _invite(attributes, invited_by, &block)
           mail
         end
 
