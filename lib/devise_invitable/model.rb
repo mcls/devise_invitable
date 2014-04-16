@@ -174,7 +174,6 @@ module Devise
           !@skip_password && super
         end
 
-        
         # Checks if the invitation for the user is within the limit time.
         # We do this by calculating if the difference between today and the
         # invitation sent date does not exceed the invite for time configured.
